@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Floating Button</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      user-select: none;
+      -webkit-app-region: drag;
+    }
+    
+    .floating-button {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4f46e5, #8b5cf6);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .floating-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+    }
+    
+    .floating-button:active {
+      transform: scale(0.95);
+    }
+  </style>
+</head>
+<body>
+  <div class="floating-button" id="floating-button">🧠</div>
+  
+  <script>
+    const floatingButton = document.getElementById('floating-button');
+    
+    // Handle mouse events for dragging
+    floatingButton.addEventListener('mousedown', (e) => {
+      window.api.onFloatingButtonMouseDown(e.clientX, e.clientY);
+    });
+    
+    document.addEventListener('mousemove', (e) => {
+      window.api.onFloatingButtonMouseMove(e.clientX, e.clientY);
+    });
+    
+    document.addEventListener('mouseup', () => {
+      window.api.onFloatingButtonMouseUp();
+    });
+    
+    // Restore app when clicked
+    floatingButton.addEventListener('click', () => {
+      window.api.restoreApp();
+    });
+  </script>
+</body>
+</html>
