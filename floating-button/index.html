@@ -1,113 +1,177 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi-AI Interface</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-  <div class="app-container">
-    <header class="app-header">
-      <div class="app-title">Multi-AI Interface</div>
-      <div class="ai-selector">
-        <label for="ai-select">Select AI:</label>
-        <select id="ai-select">
-          <option value="claude">Claude</option>
-          <option value="chatgpt">ChatGPT</option>
-          <option value="v0.dev">v0.dev</option>
-        </select>
-      </div>
-      <div class="header-buttons">
-        <button id="theme-toggle" class="icon-button" title="Toggle Theme">
-          <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi-AI Interface</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <header class="app-header">
+        <div class="app-title">Multi-AI Interface</div>
+        <div class="ai-selector">
+          <label for="ai-select">Select AI:</label>
+          <select id="ai-select">
+            <option value="gemma2-9b-it">gemma2-9b-it</option>
+            <option value="llama-3.3-70b-versatile">
+              llama-3.3-70b-versatile
+            </option>
+            <option value="llama-3.1-8b-instant">llama-3.1-8b-instant</option>
+            <option value="llama-guard-3-8b">llama-guard-3-8b</option>
+            <option value="llama3-70b-8192">llama3-70b-8192</option>
+            <option value="llama3-8b-8192">llama3-8b-8192</option>
+            <option value="whisper-large-v3">whisper-large-v3</option>
+            <option value="whisper-large-v3-turbo">
+              whisper-large-v3-turbo
+            </option>
+            <option value="distil-whisper-large-v3-en">
+              distil-whisper-large-v3-en
+            </option>
+          </select>
+        </div>
+        <div class="header-buttons">
+          <button id="theme-toggle" class="icon-button" title="Toggle Theme">
+            <svg
+              id="theme-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+            </svg>
+          </button>
+          <button id="settings-button" class="icon-button" title="Settings">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+              ></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+          </button>
+          <button
+            id="clear-button"
+            class="icon-button"
+            title="Clear Conversation"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 6h18"></path>
+              <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+              <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <main class="conversation-container" id="conversation-container">
+        <!-- Conversation messages will be added here dynamically -->
+      </main>
+
+      <footer class="input-container">
+        <textarea
+          id="user-input"
+          placeholder="Type your message here... (Ctrl+Enter to send)"
+        ></textarea>
+        <button id="send-button" class="send-button" disabled>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m22 2-7 20-4-9-9-4Z"></path>
+            <path d="M22 2 11 13"></path>
           </svg>
         </button>
-        <button id="settings-button" class="icon-button" title="Settings">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-          </svg>
-        </button>
-        <button id="clear-button" class="icon-button" title="Clear Conversation">
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M3 6h18"></path>
-            <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
-            <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
-          </svg>
-        </button>
-      </div>
-    </header>
+        <div class="status-bar" id="status-bar">Ready</div>
+      </footer>
+    </div>
 
-    <main class="conversation-container" id="conversation-container">
-      <!-- Conversation messages will be added here dynamically -->
-    </main>
-
-    <footer class="input-container">
-      <textarea id="user-input" placeholder="Type your message here... (Ctrl+Enter to send)"></textarea>
-      <button id="send-button" class="send-button" disabled>
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="m22 2-7 20-4-9-9-4Z"></path>
-          <path d="M22 2 11 13"></path>
-        </svg>
-      </button>
-      <div class="status-bar" id="status-bar">Ready</div>
-    </footer>
-  </div>
-
-  <!-- Settings Modal -->
-  <div id="settings-modal" class="modal">
-    <div class="modal-content">
-      <h2>Settings</h2>
-      <div class="settings-form">
-        <div class="form-group">
-          <h3>API Keys</h3>
-          <p class="note">Note: This demo works without API keys using mock responses.</p>
-          <div class="input-group">
-            <label for="claude-key">Claude API Key:</label>
-            <input type="password" id="claude-key" placeholder="Optional">
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal">
+      <div class="modal-content">
+        <h2>Settings</h2>
+        <div class="settings-form">
+          <div class="form-group">
+            <h3>API Keys</h3>
+            <p class="note">
+              Note: This demo works without API keys using mock responses.
+            </p>
+            <div class="input-group">
+              <label for="claude-key">Claude API Key:</label>
+              <input type="password" id="claude-key" placeholder="Optional" />
+            </div>
+            <div class="input-group">
+              <label for="openai-key">OpenAI API Key:</label>
+              <input type="password" id="openai-key" placeholder="Optional" />
+            </div>
+            <div class="input-group">
+              <label for="v0-key">v0.dev API Key:</label>
+              <input type="password" id="v0-key" placeholder="Optional" />
+            </div>
           </div>
-          <div class="input-group">
-            <label for="openai-key">OpenAI API Key:</label>
-            <input type="password" id="openai-key" placeholder="Optional">
-          </div>
-          <div class="input-group">
-            <label for="v0-key">v0.dev API Key:</label>
-            <input type="password" id="v0-key" placeholder="Optional">
+          <div class="form-group">
+            <h3>Appearance</h3>
+            <div class="input-group">
+              <label for="theme-select">Theme:</label>
+              <select id="theme-select">
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+                <option value="system">System Default</option>
+              </select>
+            </div>
           </div>
         </div>
-        <div class="form-group">
-          <h3>Appearance</h3>
-          <div class="input-group">
-            <label for="theme-select">Theme:</label>
-            <select id="theme-select">
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-              <option value="system">System Default</option>
-            </select>
-          </div>
+        <div class="modal-actions">
+          <button id="cancel-settings">Cancel</button>
+          <button id="save-settings">Save</button>
         </div>
       </div>
-      <div class="modal-actions">
-        <button id="cancel-settings">Cancel</button>
-        <button id="save-settings">Save</button>
+    </div>
+
+    <!-- Clear Confirmation Modal -->
+    <div id="clear-modal" class="modal">
+      <div class="modal-content">
+        <h2>Clear Conversation</h2>
+        <p>Are you sure you want to clear the entire conversation history?</p>
+        <div class="modal-actions">
+          <button id="cancel-clear">Cancel</button>
+          <button id="confirm-clear">Clear</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Clear Confirmation Modal -->
-  <div id="clear-modal" class="modal">
-    <div class="modal-content">
-      <h2>Clear Conversation</h2>
-      <p>Are you sure you want to clear the entire conversation history?</p>
-      <div class="modal-actions">
-        <button id="cancel-clear">Cancel</button>
-        <button id="confirm-clear">Clear</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="renderer.js"></script>
-</body>
+    <script src="renderer.js"></script>
+  </body>
 </html>
