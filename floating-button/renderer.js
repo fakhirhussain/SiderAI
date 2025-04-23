@@ -1,224 +1,305 @@
 // DOM Elements
-const aiSelect = document.getElementById("ai-select")
-const userInput = document.getElementById("user-input")
-const sendButton = document.getElementById("send-button")
-const conversationContainer = document.getElementById("conversation-container")
-const statusBar = document.getElementById("status-bar")
-const settingsButton = document.getElementById("settings-button")
-const settingsModal = document.getElementById("settings-modal")
-const cancelSettingsButton = document.getElementById("cancel-settings")
-const saveSettingsButton = document.getElementById("save-settings")
-const themeToggle = document.getElementById("theme-toggle")
-const themeIcon = document.getElementById("theme-icon")
-const themeSelect = document.getElementById("theme-select")
-const claudeKeyInput = document.getElementById("claude-key")
-const openaiKeyInput = document.getElementById("openai-key")
-const v0KeyInput = document.getElementById("v0-key")
-const clearButton = document.getElementById("clear-button")
-const clearModal = document.getElementById("clear-modal")
-const cancelClearButton = document.getElementById("cancel-clear")
-const confirmClearButton = document.getElementById("confirm-clear")
+const userInput = document.getElementById("user-input");
+const sendButton = document.getElementById("send-button");
+const conversationContainer = document.getElementById("conversation-container");
+const aiSelect = document.getElementById("ai-select");
+const statusBar = document.getElementById("status-bar");
+const themeToggle = document.getElementById("theme-toggle");
+const themeIcon = document.getElementById("theme-icon");
+const settingsButton = document.getElementById("settings-button");
+const clearButton = document.getElementById("clear-button");
+const settingsModal = document.getElementById("settings-modal");
+const clearModal = document.getElementById("clear-modal");
+const cancelSettings = document.getElementById("cancel-settings");
+const saveSettings = document.getElementById("save-settings");
+const cancelClear = document.getElementById("cancel-clear");
+const confirmClear = document.getElementById("confirm-clear");
+const themeSelect = document.getElementById("theme-select");
+const claudeKeyInput = document.getElementById("claude-key");
+const openaiKeyInput = document.getElementById("openai-key");
+const v0KeyInput = document.getElementById("v0-key");
 
 // State
-let conversation = []
-let isLoading = false
-let theme = "light"
+let conversationHistory = [];
+let isProcessing = false;
+let currentTheme = "light";
 
-// Initialize the app
-async function initApp() {
+// Initialize
+document.addEventListener("DOMContentLoaded", async () => {
   // Load conversation history
-  conversation = await window.api.getConversationHistory()
-  renderConversation()
+  try {
+    conversationHistory = await window.electronAPI.getConversationHistory();
+    renderConversation();
+  } catch (error) {
+    console.error("Failed to load conversation history:", error);
+  }
 
   // Load settings
-  const settings = await window.api.getSettings()
-  theme = settings.theme || "light"
-  themeSelect.value = theme
-  applyTheme(theme)
+  try {
+    const settings = await window.electronAPI.getSettings();
+    currentTheme = settings.theme;
+    themeSelect.value = currentTheme;
+    applyTheme(currentTheme);
+  } catch (error) {
+    console.error("Failed to load settings:", error);
+  }
 
   // Load API keys
-  const apiKeys = await window.api.getAPIKeys()
-  claudeKeyInput.value = apiKeys.claude || ""
-  openaiKeyInput.value = apiKeys.chatgpt || ""
-  v0KeyInput.value = apiKeys.v0 || ""
-
-  // Add welcome message if conversation is empty
-  if (conversation.length === 0) {
-    conversation.push({
-      role: "assistant",
-      content:
-        "Welcome to the Multi-AI Interface! This version uses mock responses for demonstration. Try asking a question or saying hello!",
-    })
-    renderConversation()
-    await window.api.saveConversationHistory(conversation)
-  }
-}
-
-// Render the conversation
-function renderConversation() {
-  conversationContainer.innerHTML = ""
-
-  conversation.forEach((msg) => {
-    const messageElement = document.createElement("div")
-    messageElement.className = `message ${msg.role}`
-
-    // Format the content (handle code blocks)
-    let formattedContent = msg.content
-
-    // Simple code block detection and formatting
-    formattedContent = formattedContent.replace(/```([\s\S]*?)```/g, (match, code) => {
-      return `<pre><code>${code}</code></pre>`
-    })
-
-    messageElement.innerHTML = formattedContent
-    conversationContainer.appendChild(messageElement)
-  })
-
-  // Scroll to bottom
-  conversationContainer.scrollTop = conversationContainer.scrollHeight
-}
-
-// Send a message
-async function sendMessage() {
-  const message = userInput.value.trim()
-  if (!message || isLoading) return
-
-  // Add user message to conversation
-  conversation.push({ role: "user", content: message })
-  userInput.value = ""
-  renderConversation()
-
-  // Update UI state
-  isLoading = true
-  sendButton.disabled = true
-  statusBar.textContent = `Sending message to ${aiSelect.value}...`
-
   try {
-    // Call the AI API
-    const response = await window.api.callAI(message, aiSelect.value)
-
-    // Add AI response to conversation
-    conversation.push({ role: "assistant", content: response })
-    renderConversation()
-
-    // Save conversation history
-    await window.api.saveConversationHistory(conversation)
-
-    statusBar.textContent = "Response received"
+    const keys = await window.electronAPI.getApiKeys();
+    claudeKeyInput.value = keys.claude || "";
+    openaiKeyInput.value = keys.chatgpt || "";
+    v0KeyInput.value = keys.v0 || "";
   } catch (error) {
-    console.error("Error calling AI:", error)
-    conversation.push({ role: "system", content: `Error: ${error.message || "Failed to get response"}` })
-    renderConversation()
-    statusBar.textContent = "Error occurred"
-  } finally {
-    isLoading = false
-    sendButton.disabled = false
+    console.error("Failed to load API keys:", error);
   }
-}
-
-// Apply theme
-function applyTheme(themeName) {
-  if (themeName === "system") {
-    // Check system preference
-    if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
-      document.body.classList.add("dark-theme")
-      themeIcon.innerHTML =
-        '<path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path><path d="M12 8a2.83 2.83 0 0 1 2 .83"></path><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path>'
-    } else {
-      document.body.classList.remove("dark-theme")
-      themeIcon.innerHTML = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>'
-    }
-  } else if (themeName === "dark") {
-    document.body.classList.add("dark-theme")
-    themeIcon.innerHTML =
-      '<path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path><path d="M12 8a2.83 2.83 0 0 1 2 .83"></path><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path>'
-  } else {
-    document.body.classList.remove("dark-theme")
-    themeIcon.innerHTML = '<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>'
-  }
-}
-
-// Toggle theme
-function toggleTheme() {
-  theme = document.body.classList.contains("dark-theme") ? "light" : "dark"
-  themeSelect.value = theme
-  applyTheme(theme)
-  window.api.saveSettings({ theme })
-}
-
-// Save settings
-async function saveSettings() {
-  // Save API keys
-  const apiKeys = {
-    claude: claudeKeyInput.value,
-    chatgpt: openaiKeyInput.value,
-    v0: v0KeyInput.value,
-  }
-  await window.api.saveAPIKeys(apiKeys)
-
-  // Save theme
-  theme = themeSelect.value
-  applyTheme(theme)
-  await window.api.saveSettings({ theme })
-
-  // Close modal
-  settingsModal.style.display = "none"
-  statusBar.textContent = "Settings saved"
-}
-
-// Clear conversation
-async function clearConversation() {
-  conversation = [
-    {
-      role: "assistant",
-      content: "Conversation cleared. How can I help you today?",
-    },
-  ]
-  renderConversation()
-  await window.api.saveConversationHistory(conversation)
-  clearModal.style.display = "none"
-  statusBar.textContent = "Conversation cleared"
-}
+});
 
 // Event Listeners
 userInput.addEventListener("input", () => {
-  sendButton.disabled = userInput.value.trim() === "" || isLoading
-
-  // Auto-resize textarea
-  userInput.style.height = "auto"
-  userInput.style.height = `${userInput.scrollHeight}px`
-})
+  sendButton.disabled = userInput.value.trim() === "";
+});
 
 userInput.addEventListener("keydown", (e) => {
-  if (e.ctrlKey && e.key === "Enter") {
-    e.preventDefault()
-    sendMessage()
+  if (e.key === "Enter" && (e.ctrlKey || e.metaKey) && !sendButton.disabled) {
+    sendMessage();
   }
-})
+});
 
-sendButton.addEventListener("click", sendMessage)
-
-settingsButton.addEventListener("click", () => {
-  settingsModal.style.display = "flex"
-})
-
-cancelSettingsButton.addEventListener("click", () => {
-  settingsModal.style.display = "none"
-})
-
-saveSettingsButton.addEventListener("click", saveSettings)
-
-themeToggle.addEventListener("click", toggleTheme)
-
+sendButton.addEventListener("click", sendMessage);
+themeToggle.addEventListener("click", toggleTheme);
+settingsButton.addEventListener("click", openSettings);
 clearButton.addEventListener("click", () => {
-  clearModal.style.display = "flex"
-})
+  clearModal.style.display = "flex";
+});
 
-cancelClearButton.addEventListener("click", () => {
-  clearModal.style.display = "none"
-})
+cancelSettings.addEventListener("click", () => {
+  settingsModal.style.display = "none";
+});
 
-confirmClearButton.addEventListener("click", clearConversation)
+saveSettings.addEventListener("click", saveSettingsHandler);
 
-// Initialize the app
-initApp()
+cancelClear.addEventListener("click", () => {
+  clearModal.style.display = "none";
+});
+
+confirmClear.addEventListener("click", clearConversation);
+
+// Close modals when clicking outside
+window.addEventListener("click", (e) => {
+  if (e.target === settingsModal) {
+    settingsModal.style.display = "none";
+  }
+  if (e.target === clearModal) {
+    clearModal.style.display = "none";
+  }
+});
+
+// Functions
+async function sendMessage() {
+  if (isProcessing) return;
+
+  const message = userInput.value.trim();
+  if (!message) return;
+
+  isProcessing = true;
+  statusBar.textContent = "Processing...";
+
+  // Add user message to conversation
+  const userMessageObj = {
+    role: "user",
+    content: message,
+    timestamp: new Date().toISOString(),
+  };
+
+  conversationHistory.push(userMessageObj);
+  renderConversation();
+
+  // Clear input
+  userInput.value = "";
+  sendButton.disabled = true;
+
+  // Scroll to bottom
+  conversationContainer.scrollTop = conversationContainer.scrollHeight;
+
+  try {
+    // Get selected model
+    const selectedModel = aiSelect.value;
+
+    // Call API
+    const response = await window.electronAPI.callGroqApi(
+      message,
+      selectedModel
+    );
+
+    // Add AI response to conversation
+    const aiMessageObj = {
+      role: "assistant",
+      content: response,
+      model: selectedModel,
+      timestamp: new Date().toISOString(),
+    };
+
+    conversationHistory.push(aiMessageObj);
+    renderConversation();
+
+    // Save conversation history
+    await window.electronAPI.saveConversationHistory(conversationHistory);
+
+    statusBar.textContent = "Ready";
+  } catch (error) {
+    console.error("Error sending message:", error);
+    statusBar.textContent = "Error: " + error.message;
+
+    // Add error message to conversation
+    const errorMessageObj = {
+      role: "system",
+      content: "Error: Failed to get response from AI.",
+      timestamp: new Date().toISOString(),
+    };
+
+    conversationHistory.push(errorMessageObj);
+    renderConversation();
+  } finally {
+    isProcessing = false;
+    conversationContainer.scrollTop = conversationContainer.scrollHeight;
+  }
+}
+
+function renderConversation() {
+  conversationContainer.innerHTML = "";
+
+  conversationHistory.forEach((msg) => {
+    const messageElement = document.createElement("div");
+    messageElement.className = `message ${msg.role}-message`;
+
+    let header = "";
+    if (msg.role === "user") {
+      header = '<div class="message-header">You</div>';
+    } else if (msg.role === "assistant") {
+      header = `<div class="message-header">AI (${
+        msg.model || "Unknown"
+      })</div>`;
+    } else {
+      header = '<div class="message-header">System</div>';
+    }
+
+    const timestamp = new Date(msg.timestamp).toLocaleTimeString();
+    const timeDisplay = `<div class="message-time">${timestamp}</div>`;
+
+    // Process content for code blocks
+    let content = msg.content;
+    content = processCodeBlocks(content);
+
+    messageElement.innerHTML = `
+      <div class="message-container">
+        ${header}
+        <div class="message-content">${content}</div>
+        ${timeDisplay}
+      </div>
+    `;
+
+    conversationContainer.appendChild(messageElement);
+  });
+}
+
+function processCodeBlocks(content) {
+  // Replace ```language ... ``` with formatted code blocks
+  return content.replace(
+    /```(\w+)?\n([\s\S]*?)```/g,
+    (match, language, code) => {
+      const lang = language || "plaintext";
+      return `<pre class="code-block ${lang}"><code>${escapeHtml(
+        code
+      )}</code></pre>`;
+    }
+  );
+}
+
+function escapeHtml(unsafe) {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+async function toggleTheme() {
+  currentTheme = currentTheme === "light" ? "dark" : "light";
+  applyTheme(currentTheme);
+
+  // Save theme setting
+  const settings = await window.electronAPI.getSettings();
+  settings.theme = currentTheme;
+  await window.electronAPI.saveSettings(settings);
+}
+
+function applyTheme(theme) {
+  document.body.className = theme;
+
+  // Update theme icon
+  if (theme === "dark") {
+    themeIcon.innerHTML = `
+      <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+    `;
+  } else {
+    themeIcon.innerHTML = `
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v2"></path>
+      <path d="M12 20v2"></path>
+      <path d="m4.93 4.93 1.41 1.41"></path>
+      <path d="m17.66 17.66 1.41 1.41"></path>
+      <path d="M2 12h2"></path>
+      <path d="M20 12h2"></path>
+      <path d="m6.34 17.66-1.41 1.41"></path>
+      <path d="m19.07 4.93-1.41 1.41"></path>
+    `;
+  }
+}
+
+function openSettings() {
+  settingsModal.style.display = "flex";
+}
+
+async function saveSettingsHandler() {
+  try {
+    // Save API keys
+    await window.electronAPI.saveApiKeys({
+      claude: claudeKeyInput.value,
+      chatgpt: openaiKeyInput.value,
+      v0: v0KeyInput.value,
+    });
+
+    // Save theme setting
+    const theme = themeSelect.value;
+    await window.electronAPI.saveSettings({
+      theme: theme,
+    });
+
+    // Apply theme if changed
+    if (theme !== currentTheme) {
+      currentTheme = theme;
+      applyTheme(currentTheme);
+    }
+
+    settingsModal.style.display = "none";
+    statusBar.textContent = "Settings saved";
+  } catch (error) {
+    console.error("Failed to save settings:", error);
+    statusBar.textContent = "Error saving settings";
+  }
+}
+
+async function clearConversation() {
+  try {
+    conversationHistory = [];
+    await window.electronAPI.clearConversationHistory();
+    renderConversation();
+    clearModal.style.display = "none";
+    statusBar.textContent = "Conversation cleared";
+  } catch (error) {
+    console.error("Failed to clear conversation:", error);
+    statusBar.textContent = "Error clearing conversation";
+  }
+}
