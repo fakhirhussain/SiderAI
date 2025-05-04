@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<MsixPackagingToolTemplate xmlns="http://schemas.microsoft.com/appx/msixpackagingtool/template/2018">
+  <Settings AllowTelemetry="true" ApplyAllPrepareComputerFixes="false" GenerateCommandLineFile="true" AllowPromptForPassword="false" p4:EnforceMicrosoftStoreRequirements="false" p5:ServerPortNumber="1599" p6:AddPackageIntegrity="false" p7:SupportedWindowsVersionForMsixCore="Windows 10 2016 LTSB (1607)" xmlns:p7="http://schemas.microsoft.com/msix/msixpackagingtool/template/2004" xmlns:p6="http://schemas.microsoft.com/msix/msixpackagingtool/template/2001" xmlns:p5="http://schemas.microsoft.com/msix/msixpackagingtool/template/1904" xmlns:p4="http://schemas.microsoft.com/msix/msixpackagingtool/template/2007" />
+  <PrepareComputer DisableWindowsSearchService="true" DisableWindowsUpdateService="true" />
+  <SaveLocation PackagePath="E:\SiderAI\siderai_1.0.0.0_x64__8zpw586fev542.msix" TemplatePath="E:\SiderAI\siderai_1.0.0.0_x64__8zpw586fev542_template.xml" />
+  <Installer InstallLocation="" />
+  <PackageInformation PackageName="siderai" PackageDisplayName="SiderAI" PublisherName="CN=SyedFakhir" PublisherDisplayName="Syed Fakhir" Version="1.0.0.0" p4:PackageDescription="A simple Python desktop app created using PyInstaller." xmlns:p4="http://schemas.microsoft.com/msix/msixpackagingtool/template/1910">
+    <Capabilities>
+      <Capability Name="runFullTrust" />
+    </Capabilities>
+  </PackageInformation>
+</MsixPackagingToolTemplate>
